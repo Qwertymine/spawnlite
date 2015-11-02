@@ -1,4 +1,3 @@
-local timer = 0
 local passive_only = false
 spawnlite = {}
 spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2}}}
@@ -34,6 +33,14 @@ local function is_space(pos,size)
 	return true
 end
 
+--Area variables
+local width = 20
+local half_width = width/2
+local height = 160
+local half_height = height/2
+
+--Timing variables
+local timer = 0
 minetest.register_globalstep(function(dtime)
 	timer = timer + dtime
 	if timer < 1 then
@@ -41,12 +48,12 @@ minetest.register_globalstep(function(dtime)
 	end
 	timer = 0
 	local players = minetest.get_connected_players()
-	local rand_x = math.random(0,19) - 10
-	local rand_z = math.random(0,19) - 10
+	local rand_x = math.random(0,width-1) - half_width
+	local rand_z = math.random(0,width-1) - half_width
 	for i=1,#players do
 		local pos = players[i]:getpos()
-		local nodes = minetest.find_nodes_in_area_under_air({x=pos.x+rand_x,y=pos.y-80,z=pos.z+rand_z}
-			,{x=pos.x+rand_x,y=pos.y+80,z=pos.z+rand_z},{"group:cracky","group:crumbly","group:snappy"})
+		local nodes = minetest.find_nodes_in_area_under_air({x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
+			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z},{"group:cracky","group:crumbly","group:snappy"})
 		for i=1,#nodes do
 			local lightlevel = minetest.get_node_light({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
 			local mob = nil
