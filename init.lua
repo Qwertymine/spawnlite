@@ -1,7 +1,7 @@
 local timer = 0
 local passive_only = false
 spawnlite = {}
-spawnlite.passive = {{name = "boats:boat",size = {x=1,y=1,z=1}}}
+spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2}}}
 spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1}}}
 
 local function is_space(pos,size)
@@ -9,7 +9,7 @@ local function is_space(pos,size)
 	if size.x*size.y*size.z == 1 then
 		return true
 	end
-	for i=2,size.x*sixe.y*size.z do
+	for i=2,size.x*size.y*size.z do
 		if x > size.x then
 			x = 0
 			y = y + 1
@@ -18,7 +18,7 @@ local function is_space(pos,size)
 			y = 0
 			z = z + 1
 		end
-		if minetest.get_node({x=pos.x+x,y=nodes[i]+y,z=pos.z+z}).name ~= "air" then
+		if minetest.get_node({x=pos.x+x,y=pos.y+y,z=pos.z+z}).name ~= "air" then
 			return false
 		end
 		x = x + 1
