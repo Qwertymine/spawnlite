@@ -23,6 +23,14 @@ local function is_space(pos,size)
 		end
 		x = x + 1
 	end
+	--[[
+	local _, no_air = minetest.find_nodes_in_area(pos,{x=pos.x+size.x-1,y=pos.y+size.y-1,z=pos.z+size.z-1},{"air"}) 
+	if no_air ~= size.x*size.y*size.z then
+		return false
+	else
+		return true
+	end
+	--]]
 	return true
 end
 
