@@ -84,12 +84,7 @@ minetest.register_globalstep(function(dtime)
 	local players = minetest.get_connected_players()
 	local rand_x = math.random(0,width-1) - half_width
 	local rand_z = math.random(0,width-1) - half_width
-	local passive
-	if passive_only then
-		passive = true
-	else
-		passive = math.random(0,1) == 1
-	end
+	local passive = passive_only or math.random(0,1) == 1
 	for i=1,#players do
 		local spawned = 0
 		local pos = players[i]:getpos()
