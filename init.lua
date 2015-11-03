@@ -27,15 +27,16 @@ local mobs = spawnlite.mobs
 
 local function is_space(pos,size)
 	local x,y,z = 1,0,0
+
 	if size.x*size.y*size.z == 1 then
 		return true
 	end
 	for i=2,size.x*size.y*size.z do
-		if x > size.x then
+		if x > size.x-1 then
 			x = 0
 			y = y + 1
 		end
-		if y > size.y then
+		if y > size.y-1 then
 			y = 0
 			z = z + 1
 		end
@@ -44,6 +45,7 @@ local function is_space(pos,size)
 		end
 		x = x + 1
 	end
+	--minetest.debug("is space")
 	--[[
 	local _, no_air = minetest.find_nodes_in_area(pos,{x=pos.x+size.x-1,y=pos.y+size.y-1,z=pos.z+size.z-1},{"air"}) 
 	if no_air ~= size.x*size.y*size.z then
@@ -93,6 +95,11 @@ minetest.register_globalstep(function(dtime)
 			{x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
 			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
 			,mob.nodes)
+			--[[
+		if #nodes >= 1 then
+			minetest.debug("nodes")
+		end
+		--]]
 		for i=1,#nodes do
 			--Spawn limit conditions
 			--These are tracked by implimentation in the mobs - I can't think
@@ -105,17 +112,17 @@ minetest.register_globalstep(function(dtime)
 			elseif not passive and mobs.agressive.now > mobs.agressive.max then
 				return
 			end
-			if mobs[mob.name] and mobs[mob.name].now > mobs[mob.name].max then
+			if mobs[mob.name] and mobs[mob.name].now > mobs[mob.name].max_no then
 				break
 			end
 
 			--Tests to check that placement suitiability for mob
 			local lightlevel = minetest.get_node_light(
 				{x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
-			if lightlevel >= (mob.min_light or 0) 
-			and lightlevel <= (mob.max_light or 16)
-			and nodes[i].y > (mob.min_height or -math.huge)
-			and nodes[i].y < (mob.max_height or math.huge) 
+			if lightlevel >= mob.min_light 
+			and lightlevel <= mob.max_light
+			and nodes[i].y > mob.min_height
+			and nodes[i].y < mob.max_height 
 			and is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
 				--chance reduce overall mob spawn rate, but is useful for the programmer
 				if not mob.chance then
@@ -133,9 +140,9 @@ end)
 local function get_mob_size(def)
 	local size = {}
 	local box = def.collisionbox
-	size.x = math.abs(box[1] - box[4])
-	size.y = math.abs(box[2] - box[5])
-	size.z = math.abs(box[3] - box[6])
+	size.x = math.ceil(math.abs(box[1] - box[4]))
+	size.y = math.ceil(math.abs(box[2] - box[5]))
+	size.z = math.ceil(math.abs(box[3] - box[6]))
 
 	return size
 end
@@ -162,21 +169,22 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 	local mob = {}
 	spawnlite.mobs[name] = spawnlite.mobs[name] or mob
 	--Setup Mob Specific table
+	mob.name = name
 	mob.nodes = nodes
-	mob.min_light = min_light
-	mob.max_light = max_light
+	mob.min_light = min_light or 0
+	mob.max_light = max_light or 16
 	mob.chance = chance_percent_1dp
-	mob.max_no = max_no
+	mob.max_no = max_no or math.huge
 	mob.now = 0
-	mob.min_height = min_height
-	mob.max_height = max_height
+	mob.min_height = min_height or -33000
+	mob.max_height = max_height or 33000
 	--Setup variables from mob def
 	local mob_def = minetest.registered_entities[name]
 	mob.size = get_mob_size(mob_def)
 	mob.group = group or get_mob_group(mob_def,nodes)
 
 	--Setup group table
-	table.insert(spawnlite.mobs[mob.group],spawnlite.mobs[name])
+	table.insert(spawnlite[mob.group],spawnlite.mobs[name])
 end
 
 dofile(minetest.get_modpath("spawnlite").."/mobs/init.lua")

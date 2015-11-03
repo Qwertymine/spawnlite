@@ -3,12 +3,12 @@ mobs = {}
 local function spawnlite_tracker(action,name)
 	if action == "add" then
 		--Spawnlite
-		spawnlite.mobs[spawnlite.mobs[name].group].now = spawlite.mobs[spawnlite.mobs[name].group].now + 1 
-		spawnlite.mobs[name].now = spawnlite.mobs[self.name].now + 1
+		spawnlite.mobs[spawnlite.mobs[name].group].now = spawnlite.mobs[spawnlite.mobs[name].group].now + 1 
+		spawnlite.mobs[name].now = spawnlite.mobs[name].now + 1
 	elseif action == "remove" then
 		--Spawnlite
-		spawnlite.mobs[spawnlite.mobs[name].group].now = spawlite.mobs[spawnlite.mobs[name].group].now - 1 
-		spawnlite.mobs[name].now = spawnlite.mobs[self.name].now - 1
+		spawnlite.mobs[spawnlite.mobs[name].group].now = spawnlite.mobs[spawnlite.mobs[name].group].now - 1 
+		spawnlite.mobs[name].now = spawnlite.mobs[name].now - 1
 	end
 end
 			
@@ -508,7 +508,7 @@ function mobs:register_mob(name, def)
 end
 
 function mobs:register_spawn(name, nodes, max_light, min_light, chance, active_object_count, max_height, spawn_func)
-	spawnlite.register_specific(name,nodes,nil,min_light,max_light,1/chance,active_object_count,nil,max_height,nil)
+	spawnlite.register_specific(name,nodes,nil,min_light,max_light,nil,nil,active_object_count,nil,max_height,nil)
 end
 
 function mobs:register_arrow(name, def)
