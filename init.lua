@@ -17,8 +17,8 @@ spawnlite.mobs.water.now = 0
 spawnlite.mobs.air.now = 0
 
 --MOB SPAWNING LIMITS
-spawnlite.mobs.passive.max = 10
-spawnlite.mobs.agressive.max = 20
+spawnlite.mobs.passive.max = 3
+spawnlite.mobs.agressive.max = 5
 spawnlite.mobs.water.max = 5
 spawnlite.mobs.air.max = 5
 
@@ -100,19 +100,21 @@ minetest.register_globalstep(function(dtime)
 			minetest.debug("nodes")
 		end
 		--]]
+		local count = 0
+		for _,obj in pairs(minetest.get_objects_inside_radius(pos, 30)) do
+			if obj:is_player() then
+			elseif obj:get_luaentity() and obj:get_luaentity().name == mob.name then
+				count = count+1
+			end
+		end
+		if count > mob.max_no then
+			return
+		end
 		for i=1,#nodes do
 			--Spawn limit conditions
 			--These are tracked by implimentation in the mobs - I can't think
 			--of a better way to do it
 			if spawned > max_no then
-				break
-			end
-			if passive and mobs.passive.now > mobs.passive.max then
-				return
-			elseif not passive and mobs.agressive.now > mobs.agressive.max then
-				return
-			end
-			if mobs[mob.name] and mobs[mob.name].now > mobs[mob.name].max_no then
 				break
 			end
 
@@ -174,7 +176,7 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 	mob.min_light = min_light or 0
 	mob.max_light = max_light or 16
 	mob.chance = chance_percent_1dp
-	mob.max_no = max_no or math.huge
+	mob.max_no = max_no or 15
 	mob.now = 0
 	mob.min_height = min_height or -33000
 	mob.max_height = max_height or 33000
