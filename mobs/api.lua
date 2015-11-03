@@ -25,6 +25,19 @@ local function get_mob_group(type,nodes)
 	return nil
 end
 
+local function spawnlite_tracker(action,name)
+	if action == "add" then
+		--Spawnlite
+		spawnlite.mobs[spawnlite.mobs[name].group].now = spawlite.mobs[spawnlite.mobs[name].group].now + 1 
+		spawnlite.mobs[name].now = spawnlite.mobs[self.name].now + 1
+	elseif action == "remove" then
+		--Spawnlite
+		spawnlite.mobs[spawnlite.mobs[name].group].now = spawlite.mobs[spawnlite.mobs[name].group].now - 1 
+		spawnlite.mobs[name].now = spawnlite.mobs[self.name].now - 1
+	end
+end
+			
+
 function mobs:register_mob(name, def)
 	minetest.register_entity(name, {
 		hp_max = def.hp_max,
@@ -48,8 +61,6 @@ function mobs:register_mob(name, def)
 		drawtype = def.drawtype,
 		on_rightclick = def.on_rightclick,
 		type = def.type,
-		--Spawnlite
-		group = def.group,
 		attack_type = def.attack_type,
 		arrow = def.arrow,
 		shoot_interval = def.shoot_interval,
@@ -143,8 +154,7 @@ function mobs:register_mob(name, def)
 		on_step = function(self, dtime)
 			if self.type == "monster" and minetest.setting_getbool("only_peaceful_mobs") then
 				--Spawnlite
-				spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-				spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+				spawnlite_tracker("remove",self.name)
 				self.object:remove()
 			end
 			
@@ -158,8 +168,7 @@ function mobs:register_mob(name, def)
 				end
 				if player_count == 0 and self.state ~= "attack" then
 					--Spawnlite
-					spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-					spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+					spawnlite_tracker("remove",self.name)
 					self.object:remove()
 					return
 				end
@@ -187,8 +196,7 @@ function mobs:register_mob(name, def)
 						self.object:set_hp(self.object:get_hp()-damage)
 						if self.object:get_hp() == 0 then
 							--Spawnlite
-							spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-							spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+							spawnlite_tracker("remove",self.name)
 							self.object:remove()
 						end
 					end
@@ -222,8 +230,7 @@ function mobs:register_mob(name, def)
 					self.object:set_hp(self.object:get_hp()-self.light_damage)
 					if self.object:get_hp() == 0 then
 						--Spawnlite
-						spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-						spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+						spawnlite_tracker("remove",self.name)
 						self.object:remove()
 					end
 				end
@@ -234,8 +241,7 @@ function mobs:register_mob(name, def)
 					self.object:set_hp(self.object:get_hp()-self.water_damage)
 					if self.object:get_hp() == 0 then
 						--Spawnlite
-						spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-						spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+						spawnlite_tracker("remove",self.name)
 						self.object:remove()
 					end
 				end
@@ -246,8 +252,7 @@ function mobs:register_mob(name, def)
 					self.object:set_hp(self.object:get_hp()-self.lava_damage)
 					if self.object:get_hp() == 0 then
 						--Spawnlite
-						spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-						spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+						spawnlite_tracker("remove",self.name)
 						self.object:remove()
 					end
 				end
@@ -482,11 +487,6 @@ function mobs:register_mob(name, def)
 			self.object:setvelocity({x=0, y=self.object:getvelocity().y, z=0})
 			self.object:setyaw(math.random(1, 360)/180*math.pi)
 			if self.type == "monster" and minetest.setting_getbool("only_peaceful_mobs") then
-				--Spawnlite
-				--[[
-				spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-				spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
-				--]]
 				self.object:remove()
 			end
 			self.lifetimer = 600 - dtime_s
@@ -500,16 +500,10 @@ function mobs:register_mob(name, def)
 				end
 			end
 			if self.lifetimer <= 0 and not self.tamed then
-				--Spawnlite
-				--[[
-				spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-				spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
-				--]]
 				self.object:remove()
 			end
 			--Spawnlite
-			spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now + 1 
-			spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now + 1
+			spawnlite_tracker("add",self.name)
 		end,
 		
 		get_staticdata = function(self)
@@ -519,8 +513,7 @@ function mobs:register_mob(name, def)
 			}
 
 			--Spawnlite
-			spawnlite.mobs[self.group].now = spawlite.mobs[self.group].now - 1 
-			spawnlite.mobs[self.name].now = spawnlite.mobs[self.name].now - 1
+			spawnlite_tracker("remove",self.name)
 			return minetest.serialize(tmp)
 		end,
 		
@@ -539,51 +532,8 @@ function mobs:register_mob(name, def)
 	})
 end
 
-mobs.spawning_mobs = {}
 function mobs:register_spawn(name, nodes, max_light, min_light, chance, active_object_count, max_height, spawn_func)
-	mobs.spawning_mobs[name] = true
-	minetest.register_abm({
-		nodenames = nodes,
-		neighbors = {"air"},
-		interval = 30,
-		chance = chance,
-		action = function(pos, node, _, active_object_count_wider)
-			if active_object_count_wider > active_object_count then
-				return
-			end
-			if not mobs.spawning_mobs[name] then
-				return
-			end
-			pos.y = pos.y+1
-			if not minetest.env:get_node_light(pos) then
-				return
-			end
-			if minetest.env:get_node_light(pos) > max_light then
-				return
-			end
-			if minetest.env:get_node_light(pos) < min_light then
-				return
-			end
-			if pos.y > max_height then
-				return
-			end
-			if minetest.env:get_node(pos).name ~= "air" then
-				return
-			end
-			pos.y = pos.y+1
-			if minetest.env:get_node(pos).name ~= "air" then
-				return
-			end
-			if spawn_func and not spawn_func(pos, node) then
-				return
-			end
-			
-			if minetest.setting_getbool("display_mob_spawn") then
-				minetest.chat_send_all("[mobs] Add "..name.." at "..minetest.pos_to_string(pos))
-			end
-			minetest.env:add_entity(pos, name)
-		end
-	})
+	spawnlite.register_specific(name,nodes,nil,min_light,max_light,1/chance,nil,nil,max_height,nil)
 end
 
 function mobs:register_arrow(name, def)
