@@ -1,7 +1,7 @@
 local passive_only = false
 spawnlite = {}
 spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2},nodes = {"group:cracky","group:crumbly","group:snappy"},min_light = 8}}
-spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1},nodes = {"group:cracky","group:crumbly","group:snappy"},max_light = 7}}
+spawnlite.agressive = {}
 spawnlite.water = {}
 spawnlite.air = {}
 
@@ -176,6 +176,10 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 	mob.group = group or get_mob_group(mob_def,nodes)
 
 	--Setup group table
+	--
+	--i
+	--jkkljkj
 	table.insert(spawnlite.mobs[mob.group],spawnlite.mobs[name])
 end
 
+dofile(minetest.get_modpath("spawnlite").."mobs/init.lua")

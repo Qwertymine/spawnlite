@@ -533,7 +533,7 @@ function mobs:register_mob(name, def)
 end
 
 function mobs:register_spawn(name, nodes, max_light, min_light, chance, active_object_count, max_height, spawn_func)
-	spawnlite.register_specific(name,nodes,nil,min_light,max_light,1/chance,nil,nil,max_height,nil)
+	spawnlite.register_specific(name,nodes,nil,min_light,max_light,1/chance,active_object_count,nil,max_height,nil)
 end
 
 function mobs:register_arrow(name, def)

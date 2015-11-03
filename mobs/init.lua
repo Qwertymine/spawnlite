@@ -1,6 +1,6 @@
-dofile(minetest.get_modpath("mobs").."/api.lua")
+dofile(minetest.get_modpath("spawnlite").."mobs/api.lua")
 
-mobs:register_mob("mobs:dirt_monster", {
+spawnliteregister_mob("spawnlitedirt_monster", {
 	type = "monster",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -39,9 +39,9 @@ mobs:register_mob("mobs:dirt_monster", {
 		punch_end = 63,
 	}
 })
-mobs:register_spawn("mobs:dirt_monster", {"default:dirt_with_grass"}, 3, -1, 7000, 3, 31000)
+spawnliteregister_spawn("spawnlitedirt_monster", {"default:dirt_with_grass"}, 3, -1, 7000, 3, 31000)
 
-mobs:register_mob("mobs:stone_monster", {
+spawnliteregister_mob("spawnlitestone_monster", {
 	type = "monster",
 	hp_max = 10,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -80,9 +80,9 @@ mobs:register_mob("mobs:stone_monster", {
 		punch_end = 63,
 	}
 })
-mobs:register_spawn("mobs:stone_monster", {"default:stone"}, 3, -1, 7000, 3, 0)
+spawnliteregister_spawn("spawnlitestone_monster", {"default:stone"}, 3, -1, 7000, 3, 0)
 
-mobs:register_mob("mobs:sand_monster", {
+spawnliteregister_mob("spawnlitesand_monster", {
 	type = "monster",
 	hp_max = 3,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -121,9 +121,9 @@ mobs:register_mob("mobs:sand_monster", {
 		punch_end = 105,
 	},
 })
-mobs:register_spawn("mobs:sand_monster", {"default:desert_sand"}, 20, -1, 7000, 3, 31000)
+spawnliteregister_spawn("spawnlitesand_monster", {"default:desert_sand"}, 20, -1, 7000, 3, 31000)
 
-mobs:register_mob("mobs:tree_monster", {
+spawnliteregister_mob("spawnlitetree_monster", {
 	type = "monster",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -167,9 +167,9 @@ mobs:register_mob("mobs:tree_monster", {
 		punch_end = 62,
 	},
 })
-mobs:register_spawn("mobs:tree_monster", {"default:leaves", "default:jungleleaves"}, 3, -1, 7000, 3, 31000)
+spawnliteregister_spawn("spawnlitetree_monster", {"default:leaves", "default:jungleleaves"}, 3, -1, 7000, 3, 31000)
 
-mobs:register_mob("mobs:sheep", {
+spawnliteregister_mob("spawnlitesheep", {
 	type = "animal",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1, 0.4},
@@ -180,7 +180,7 @@ mobs:register_mob("mobs:sheep", {
 	walk_velocity = 1,
 	armor = 200,
 	drops = {
-		{name = "mobs:meat_raw",
+		{name = "spawnlitemeat_raw",
 		chance = 1,
 		min = 2,
 		max = 3,},
@@ -240,14 +240,14 @@ mobs:register_mob("mobs:sheep", {
 		end
 	end,
 })
-mobs:register_spawn("mobs:sheep", {"default:dirt_with_grass"}, 20, 8, 9000, 1, 31000)
+spawnliteregister_spawn("spawnlitesheep", {"default:dirt_with_grass"}, 20, 8, 9000, 1, 31000)
 
-minetest.register_craftitem("mobs:meat_raw", {
+minetest.register_craftitem("spawnlitemeat_raw", {
 	description = "Raw Meat",
 	inventory_image = "mobs_meat_raw.png",
 })
 
-minetest.register_craftitem("mobs:meat", {
+minetest.register_craftitem("spawnlitemeat", {
 	description = "Meat",
 	inventory_image = "mobs_meat.png",
 	on_use = minetest.item_eat(8),
@@ -255,12 +255,12 @@ minetest.register_craftitem("mobs:meat", {
 
 minetest.register_craft({
 	type = "cooking",
-	output = "mobs:meat",
-	recipe = "mobs:meat_raw",
+	output = "spawnlitemeat",
+	recipe = "spawnlitemeat_raw",
 	cooktime = 5,
 })
 
-mobs:register_mob("mobs:rat", {
+spawnliteregister_mob("spawnliterat", {
 	type = "animal",
 	hp_max = 1,
 	collisionbox = {-0.2, -0.01, -0.2, 0.2, 0.2, 0.2},
@@ -278,27 +278,27 @@ mobs:register_mob("mobs:rat", {
 	
 	on_rightclick = function(self, clicker)
 		if clicker:is_player() and clicker:get_inventory() then
-			clicker:get_inventory():add_item("main", "mobs:rat")
+			clicker:get_inventory():add_item("main", "spawnliterat")
 			self.object:remove()
 		end
 	end,
 })
-mobs:register_spawn("mobs:rat", {"default:dirt_with_grass", "default:stone"}, 20, -1, 7000, 1, 31000)
+spawnliteregister_spawn("spawnliterat", {"default:dirt_with_grass", "default:stone"}, 20, -1, 7000, 1, 31000)
 
-minetest.register_craftitem("mobs:rat", {
+minetest.register_craftitem("spawnliterat", {
 	description = "Rat",
 	inventory_image = "mobs_rat_inventory.png",
 	
 	on_place = function(itemstack, placer, pointed_thing)
 		if pointed_thing.above then
-			minetest.env:add_entity(pointed_thing.above, "mobs:rat")
+			minetest.env:add_entity(pointed_thing.above, "spawnliterat")
 			itemstack:take_item()
 		end
 		return itemstack
 	end,
 })
 	
-minetest.register_craftitem("mobs:rat_cooked", {
+minetest.register_craftitem("spawnliterat_cooked", {
 	description = "Cooked Rat",
 	inventory_image = "mobs_cooked_rat.png",
 	
@@ -307,12 +307,12 @@ minetest.register_craftitem("mobs:rat_cooked", {
 
 minetest.register_craft({
 	type = "cooking",
-	output = "mobs:rat_cooked",
-	recipe = "mobs:rat",
+	output = "spawnliterat_cooked",
+	recipe = "spawnliterat",
 	cooktime = 5,
 })
 
-mobs:register_mob("mobs:oerkki", {
+spawnliteregister_mob("spawnliteoerkki", {
 	type = "monster",
 	hp_max = 8,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -346,9 +346,9 @@ mobs:register_mob("mobs:oerkki", {
 		speed_run = 15,
 	},
 })
-mobs:register_spawn("mobs:oerkki", {"default:stone"}, 2, -1, 7000, 3, -10)
+spawnliteregister_spawn("spawnliteoerkki", {"default:stone"}, 2, -1, 7000, 3, -10)
 
-mobs:register_mob("mobs:dungeon_master", {
+spawnliteregister_mob("spawnlitedungeon_master", {
 	type = "monster",
 	hp_max = 10,
 	collisionbox = {-0.7, -0.01, -0.7, 0.7, 2.6, 0.7},
@@ -374,7 +374,7 @@ mobs:register_mob("mobs:dungeon_master", {
 	light_damage = 0,
 	on_rightclick = nil,
 	attack_type = "shoot",
-	arrow = "mobs:fireball",
+	arrow = "spawnlitefireball",
 	shoot_interval = 2.5,
 	sounds = {
 		attack = "mobs_fireball",
@@ -390,9 +390,9 @@ mobs:register_mob("mobs:dungeon_master", {
 		speed_run = 15,
 	},
 })
-mobs:register_spawn("mobs:dungeon_master", {"default:stone"}, 2, -1, 7000, 1, -50)
+spawnliteregister_spawn("spawnlitedungeon_master", {"default:stone"}, 2, -1, 7000, 1, -50)
 
-mobs:register_arrow("mobs:fireball", {
+spawnliteregister_arrow("spawnlitefireball", {
 	visual = "sprite",
 	visual_size = {x=1, y=1},
 	--textures = {{name="mobs_fireball.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=0.5}}}, FIXME
