@@ -101,9 +101,9 @@ minetest.register_globalstep(function(dtime)
 				break
 			end
 			if passive and mobs.passive.now > mobs.passive.max then
-				break
+				return
 			elseif not passive and mobs.agressive.now > mobs.agressive.max then
-				break
+				return
 			end
 			if mobs[mob.name] and mobs[mob.name].now > mobs[mob.name].max then
 				break
