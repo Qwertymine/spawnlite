@@ -2,6 +2,7 @@ mobs = {}
 
 function mobs:register_mob(name, def)
 	minetest.register_entity(name, {
+		name = name,
 		hp_max = def.hp_max,
 		physical = true,
 		collisionbox = def.collisionbox,
@@ -460,8 +461,6 @@ function mobs:register_mob(name, def)
 				tamed = self.tamed,
 			}
 
-			--Spawnlite
-			spawnlite_tracker("remove",self.name)
 			return minetest.serialize(tmp)
 		end,
 		

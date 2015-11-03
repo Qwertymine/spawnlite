@@ -99,6 +99,7 @@ minetest.register_globalstep(function(dtime)
 			minetest.debug("nodes")
 		end
 		--]]
+		--[[
 		local count = 0
 		for _,obj in pairs(minetest.get_objects_inside_radius(pos, 30)) do
 			if obj:is_player() then
@@ -109,11 +110,20 @@ minetest.register_globalstep(function(dtime)
 		if count > mob.max_no then
 			return
 		end
+		--]]
 		for i=1,#nodes do
 			--Spawn limit conditions
 			--These are tracked by implimentation in the mobs - I can't think
 			--of a better way to do it
 			if spawned > max_no then
+				break
+			end
+			if passive and mobs.passive.now > mobs.passive.max then
+				return
+			elseif not passive and  mobs.agressive.now > mobs.agressive.max then
+				return
+			end
+			if mobs[mob.name].now > mobs[mob.name].max then
 				break
 			end
 
@@ -128,14 +138,56 @@ minetest.register_globalstep(function(dtime)
 				--chance reduce overall mob spawn rate, but is useful for the programmer
 				if not mob.chance then
 					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+					mobs[mob.name].now = mobs[mob.name].now + 1
+					if passive then
+						mobs.passive.now = mobs.passive.now + 1
+					else
+						mobs.agressive.now = mobs.agressive.now + 1
+					end
 					spawned = spawned + 1
 				elseif math.random(1,1000) < mob.chance * 10 then
 					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+					mobs[mob.name].now = mobs[mob.name].now + 1
+					if passive then
+						mobs.passive.now = mobs.passive.now + 1
+					else
+						mobs.agressive.now = mobs.agressive.now + 1
+					end
 					spawned = spawned + 1
 				end
 			end
 		end
 	end
+end)
+
+local mob_count_timer = 0
+minetest.register_globalstep(function(dtime)
+	mob_count_timer = mob_count_timer + dtime
+	if mob_count_timer < 5 then
+		return
+	end
+	mob_count_timer = 0
+	for k,v in pairs(spawnlite.mobs) do
+		v.now = 0
+	end
+	for k,v in pairs(minetest.luaentities) do
+		if v.name and spawnlite.mobs[v.name] then
+			spawnlite.mobs[v.name].now = spawnlite.mobs[v.name].now + 1
+		end
+	end
+	for i=1,#spawnlite.passive do
+		spawnlite.mobs.passive.now = spawnlite.mobs.passive.now + spawnlite.passive[i].now
+	end
+	for i=1,#spawnlite.agressive do
+		spawnlite.mobs.agressive.now = spawnlite.mobs.agressive.now + spawnlite.agressive[i].now
+	end
+	minetest.debug(spawnlite.mobs.passive.now)
+	--[[
+	for k,v in pairs(minetest.luaentities) do
+		minetest.debug(k)
+		minetest.debug(v.name)
+	end
+	--]]
 end)
 
 local function get_mob_size(def)
