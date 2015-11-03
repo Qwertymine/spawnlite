@@ -1,7 +1,7 @@
 local passive_only = false
 spawnlite = {}
-spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2},blocks = {"group:cracky","group:crumbly","group:snappy"},min_light = 8}}
-spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1},blocks = {"group:cracky","group:crumbly","group:snappy"},max_light = 7}}
+spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2},nodes = {"group:cracky","group:crumbly","group:snappy"},min_light = 8}}
+spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1},nodes = {"group:cracky","group:crumbly","group:snappy"},max_light = 7}}
 spawnlite.water = {}
 spawnlite.air = {}
 
@@ -92,7 +92,7 @@ minetest.register_globalstep(function(dtime)
 		local nodes = minetest.find_nodes_in_area_under_air(
 			{x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
 			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
-			,mob.blocks)
+			,mob.nodes)
 		for i=1,#nodes do
 			--Spawn limit conditions
 			--These are tracked by implimentation in the mobs - I can't think
@@ -129,4 +129,53 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
+local function get_mob_size(def)
+	local size = {}
+	local box = def.collisionbox
+	size.x = math.abs(box[1] - box[4])
+	size.y = math.abs(box[2] - box[5])
+	size.z = math.abs(box[3] - box[6])
+
+	return size
+end
+
+local function get_mob_group(def,nodes)
+	if def.group then
+		return def.group
+	if nodes[1] == "air" then
+		return "air"
+	elseif nodes[1] == "default:water" then
+		return "water"
+	elseif mob.type == "monster" then
+		return "agressive"
+	else
+		return "passive"
+	end
+	return nil
+end
+
+spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
+	,max_light,ignored_interval,chance_percent_1dp,max_no,min_height
+	,max_height,group)
+
+	local mob = {}
+	spawnlite.mobs[name] = spawnlite.mobs[name] or mob
+	--Setup Mob Specific table
+	mob.nodes = nodes
+	mob.min_light = min_light
+	mob.max_light = max_light
+	mob.chance = chance_percent_1dp
+	mob.max_no = max_no
+	mob.now = 0
+	mob.min_height = min_height
+	mob.max_height = max_height
+	--Setup variables from mob def
+	local mob_def = minetest.registered_enities[name]
+	mob.size = get_mob_size(mob_def)
+	mob.group = group or get_mob_group(mob_def,nodes)
+
+	--Setup group table
+	table.insert(spawnlite.mobs[mob.group],spawnlite.mobs[name])
+end
 
