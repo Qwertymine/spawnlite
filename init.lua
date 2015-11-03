@@ -113,8 +113,6 @@ minetest.register_globalstep(function(dtime)
 		--]]
 		for i=1,#nodes do
 			--Spawn limit conditions
-			--These are tracked by implimentation in the mobs - I can't think
-			--of a better way to do it
 			if spawned > max_no then
 				break
 			end
@@ -123,7 +121,7 @@ minetest.register_globalstep(function(dtime)
 			elseif not passive and  mobs.agressive.now > mobs.agressive.max then
 				return
 			end
-			if mobs[mob.name].now > mobs[mob.name].max then
+			if mobs[mob.name].now > mobs[mob.name].max_no then
 				break
 			end
 
