@@ -5,6 +5,26 @@ spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1},blocks = {"grou
 spawnlite.water = {}
 spawnlite.air = {}
 
+spawnlite.mobs = {}
+spawnlite.mobs.passive = {}
+spawnlite.mobs.agressive = {}
+spawnlite.mobs.water = {}
+spawnlite.mobs.air = {}
+
+spawnlite.mobs.passive.now = 0
+spawnlite.mobs.agressive.now = 0
+spawnlite.mobs.water.now = 0
+spawnlite.mobs.air.now = 0
+
+--MOB SPAWNING LIMITS
+spawnlite.mobs.passive.max = 10
+spawnlite.mobs.agressive.max = 20
+spawnlite.mobs.water.max = 5
+spawnlite.mobs.air.max = 5
+
+local mobs = spawnlite.mobs
+
+
 local function is_space(pos,size)
 	local x,y,z = 1,0,0
 	if size.x*size.y*size.z == 1 then
@@ -79,14 +99,31 @@ minetest.register_globalstep(function(dtime)
 			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
 			,mob.blocks)
 		for i=1,#nodes do
+			--Spawn limit conditions
+			--These are tracked by implimentation in the mobs - I can't think
+			--of a better way to do it
 			if spawned > max_no then
 				break
 			end
+			if passive and mobs.passive.now > mobs.passive.max then
+				break
+			elseif not passive and mobs.agressive.now > mobs.agressive.max then
+				break
+			end
+			if mobs[mob.name] and mobs[mob.name].now > mobs[mob.name].max then
+				break
+			end
+
+			--Tests to check that placement suitiability for mob
 			local lightlevel = minetest.get_node_light(
 				{x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
 			if lightlevel >= (mob.min_light or 0) 
-			and lightlevel <= (mob.max_light or 16)then
+			and lightlevel <= (mob.max_light or 16)
+			and nodes[i].y > (mob.min_height or -math.huge)
+			and nodes[i].y < (mob.max_height or math.huge) then
+
 				if is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
+					--chance reduce overall mob spawn rate, but is useful for the programmer
 					if not mob.chance then
 						minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
 						spawned = spawned + 1
