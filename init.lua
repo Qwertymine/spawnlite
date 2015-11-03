@@ -120,17 +120,15 @@ minetest.register_globalstep(function(dtime)
 			if lightlevel >= (mob.min_light or 0) 
 			and lightlevel <= (mob.max_light or 16)
 			and nodes[i].y > (mob.min_height or -math.huge)
-			and nodes[i].y < (mob.max_height or math.huge) then
-
-				if is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
-					--chance reduce overall mob spawn rate, but is useful for the programmer
-					if not mob.chance then
-						minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
-						spawned = spawned + 1
-					elseif math.random(1,1000) < mob.chance * 10 then
-						minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
-						spawned = spawned + 1
-					end
+			and nodes[i].y < (mob.max_height or math.huge) 
+			and is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
+				--chance reduce overall mob spawn rate, but is useful for the programmer
+				if not mob.chance then
+					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+					spawned = spawned + 1
+				elseif math.random(1,1000) < mob.chance * 10 then
+					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+					spawned = spawned + 1
 				end
 			end
 		end
