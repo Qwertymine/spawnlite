@@ -69,16 +69,17 @@ end
 local max_no = 1 --per player per spawn attempt
 
 --Area variables
-local width = 20
+local width = 60
 local half_width = width/2
 local height = 80
 local half_height = height/2
 
 --Timing variables
 local timer = 0
+local spawn_interval = 1
 minetest.register_globalstep(function(dtime)
 	timer = timer + dtime
-	if timer < 1 then
+	if timer < spawn_interval then
 		return
 	end
 	timer = 0
@@ -94,23 +95,6 @@ minetest.register_globalstep(function(dtime)
 			{x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
 			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
 			,mob.nodes)
-			--[[
-		if #nodes >= 1 then
-			minetest.debug("nodes")
-		end
-		--]]
-		--[[
-		local count = 0
-		for _,obj in pairs(minetest.get_objects_inside_radius(pos, 30)) do
-			if obj:is_player() then
-			elseif obj:get_luaentity() and obj:get_luaentity().name == mob.name then
-				count = count+1
-			end
-		end
-		if count > mob.max_no then
-			return
-		end
-		--]]
 		for i=1,#nodes do
 			--Spawn limit conditions
 			if spawned > max_no then
@@ -118,7 +102,7 @@ minetest.register_globalstep(function(dtime)
 			end
 			if passive and mobs.passive.now > mobs.passive.max then
 				return
-			elseif not passive and  mobs.agressive.now > mobs.agressive.max then
+			elseif not passive and mobs.agressive.now > mobs.agressive.max then
 				return
 			end
 			if mobs[mob.name].now > mobs[mob.name].max_no then
@@ -159,9 +143,10 @@ minetest.register_globalstep(function(dtime)
 end)
 
 local mob_count_timer = 0
+local moblist_update_time = 5
 minetest.register_globalstep(function(dtime)
 	mob_count_timer = mob_count_timer + dtime
-	if mob_count_timer < 5 then
+	if mob_count_timer < moblist_update_time then
 		return
 	end
 	mob_count_timer = 0
@@ -169,17 +154,16 @@ minetest.register_globalstep(function(dtime)
 		v.now = 0
 	end
 	for k,v in pairs(minetest.luaentities) do
-		if v.name and spawnlite.mobs[v.name] then
-			spawnlite.mobs[v.name].now = spawnlite.mobs[v.name].now + 1
+		if v.name and mobs[v.name] then
+			mobs[v.name].now = mobs[v.name].now + 1
 		end
 	end
 	for i=1,#spawnlite.passive do
-		spawnlite.mobs.passive.now = spawnlite.mobs.passive.now + spawnlite.passive[i].now
+		mobs.passive.now = mobs.passive.now + spawnlite.passive[i].now
 	end
 	for i=1,#spawnlite.agressive do
-		spawnlite.mobs.agressive.now = spawnlite.mobs.agressive.now + spawnlite.agressive[i].now
+		mobs.agressive.now = mobs.agressive.now + spawnlite.agressive[i].now
 	end
-	minetest.debug(spawnlite.mobs.passive.now)
 	--[[
 	for k,v in pairs(minetest.luaentities) do
 		minetest.debug(k)
@@ -225,7 +209,7 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 	mob.min_light = min_light or 0
 	mob.max_light = max_light or 16
 	mob.chance = chance_percent_1dp
-	mob.max_no = max_no or 15
+	mob.max_no = max_no or 5
 	mob.now = 0
 	mob.min_height = min_height or -33000
 	mob.max_height = max_height or 33000
