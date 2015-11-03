@@ -1,7 +1,9 @@
 local passive_only = false
 spawnlite = {}
-spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2}}}
-spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1}}}
+spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2},blocks = {"group:cracky","group:crumbly","group:snappy"},min_light = 8}}
+spawnlite.agressive = {{name = "boats:boat",size = {x=1,y=1,z=1},blocks = {"group:cracky","group:crumbly","group:snappy"},max_light = 7}}
+spawnlite.water = {}
+spawnlite.air = {}
 
 local function is_space(pos,size)
 	local x,y,z = 1,0,0
@@ -33,10 +35,22 @@ local function is_space(pos,size)
 	return true
 end
 
+local function get_new_mob(passive)
+	if passive then
+		return spawnlite.passive[math.random(1,#spawnlite.passive)]
+	else
+		return spawnlite.agressive[math.random(1,#spawnlite.agressive)]
+	end
+	return nil
+end
+
+--Spawning variables
+local max_no = 1 --per player per spawn attempt
+
 --Area variables
 local width = 20
 local half_width = width/2
-local height = 160
+local height = 80
 local half_height = height/2
 
 --Timing variables
@@ -50,26 +64,37 @@ minetest.register_globalstep(function(dtime)
 	local players = minetest.get_connected_players()
 	local rand_x = math.random(0,width-1) - half_width
 	local rand_z = math.random(0,width-1) - half_width
+	local passive
+	if passive_only then
+		passive = true
+	else
+		passive = math.random(0,1) == 1
+	end
 	for i=1,#players do
+		local spawned = 0
 		local pos = players[i]:getpos()
-		local nodes = minetest.find_nodes_in_area_under_air({x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
-			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z},{"group:cracky","group:crumbly","group:snappy"})
+		local mob = get_new_mob(passive)
+		local nodes = minetest.find_nodes_in_area_under_air(
+			{x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
+			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
+			,mob.blocks)
 		for i=1,#nodes do
-			local lightlevel = minetest.get_node_light({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
-			local mob = nil
-			if lightlevel < 8 then
-				if passive_only then
-					break
-				end
-				mob = spawnlite.agressive[math.random(1,#spawnlite.agressive)]
-			else
-				if minetest.get_node(nodes[i]).name ~= "default:sand" then
-					break
-				end
-				mob = spawnlite.passive[math.random(1,#spawnlite.passive)]
+			if spawned > max_no then
+				break
 			end
-			if is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
-				minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+			local lightlevel = minetest.get_node_light(
+				{x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
+			if lightlevel >= (mob.min_light or 0) 
+			and lightlevel <= (mob.max_light or 16)then
+				if is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
+					if not mob.chance then
+						minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+						spawned = spawned + 1
+					elseif math.random(1,1000) < mob.chance * 10 then
+						minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
+						spawned = spawned + 1
+					end
+				end
 			end
 		end
 	end
