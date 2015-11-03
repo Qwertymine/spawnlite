@@ -143,11 +143,11 @@ end
 local function get_mob_group(def,nodes)
 	if def.group then
 		return def.group
-	if nodes[1] == "air" then
+	elseif nodes[1] == "air" then
 		return "air"
 	elseif nodes[1] == "default:water" then
 		return "water"
-	elseif mob.type == "monster" then
+	elseif def.type == "monster" then
 		return "agressive"
 	else
 		return "passive"
@@ -171,15 +171,12 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 	mob.min_height = min_height
 	mob.max_height = max_height
 	--Setup variables from mob def
-	local mob_def = minetest.registered_enities[name]
+	local mob_def = minetest.registered_entities[name]
 	mob.size = get_mob_size(mob_def)
 	mob.group = group or get_mob_group(mob_def,nodes)
 
 	--Setup group table
-	--
-	--i
-	--jkkljkj
 	table.insert(spawnlite.mobs[mob.group],spawnlite.mobs[name])
 end
 
-dofile(minetest.get_modpath("spawnlite").."mobs/init.lua")
+dofile(minetest.get_modpath("spawnlite").."/mobs/init.lua")

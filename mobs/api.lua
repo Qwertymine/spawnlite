@@ -1,30 +1,5 @@
 mobs = {}
 
-local function get_mob_size(def)
-	local size = {}
-	local box = def.collisionbox
-	size.x = math.abs(box[1] - box[4])
-	size.y = math.abs(box[2] - box[5])
-	size.z = math.abs(box[3] - box[6])
-
-	return size
-end
-
-local function get_mob_group(type,nodes)
-	if def.group then
-		return def.group
-	if nodes[1] == "air" then
-		return "air"
-	elseif nodes[1] == "default:water" then
-		return "water"
-	elseif type == "monster" then
-		return "agressive"
-	else
-		return "passive"
-	end
-	return nil
-end
-
 local function spawnlite_tracker(action,name)
 	if action == "add" then
 		--Spawnlite

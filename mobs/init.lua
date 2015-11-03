@@ -1,6 +1,6 @@
-dofile(minetest.get_modpath("spawnlite").."mobs/api.lua")
+dofile(minetest.get_modpath("spawnlite").."/mobs/api.lua")
 
-spawnliteregister_mob("spawnlitedirt_monster", {
+mobs:register_mob("spawnlite:dirt_monster", {
 	type = "monster",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -39,9 +39,10 @@ spawnliteregister_mob("spawnlitedirt_monster", {
 		punch_end = 63,
 	}
 })
-spawnliteregister_spawn("spawnlitedirt_monster", {"default:dirt_with_grass"}, 3, -1, 7000, 3, 31000)
 
-spawnliteregister_mob("spawnlitestone_monster", {
+mobs:register_spawn("spawnlite:dirt_monster", {"default:dirt_with_grass"}, 3, -1, 7000, 3, 31000)
+
+mobs:register_mob("spawnlite:stone_monster", {
 	type = "monster",
 	hp_max = 10,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -80,9 +81,9 @@ spawnliteregister_mob("spawnlitestone_monster", {
 		punch_end = 63,
 	}
 })
-spawnliteregister_spawn("spawnlitestone_monster", {"default:stone"}, 3, -1, 7000, 3, 0)
+mobs:register_spawn("spawnlite:stone_monster", {"default:stone"}, 3, -1, 7000, 3, 0)
 
-spawnliteregister_mob("spawnlitesand_monster", {
+mobs:register_mob("spawnlite:sand_monster", {
 	type = "monster",
 	hp_max = 3,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -121,9 +122,9 @@ spawnliteregister_mob("spawnlitesand_monster", {
 		punch_end = 105,
 	},
 })
-spawnliteregister_spawn("spawnlitesand_monster", {"default:desert_sand"}, 20, -1, 7000, 3, 31000)
+mobs:register_spawn("spawnlite:sand_monster", {"default:desert_sand"}, 20, -1, 7000, 3, 31000)
 
-spawnliteregister_mob("spawnlitetree_monster", {
+mobs:register_mob("spawnlite:tree_monster", {
 	type = "monster",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -167,9 +168,9 @@ spawnliteregister_mob("spawnlitetree_monster", {
 		punch_end = 62,
 	},
 })
-spawnliteregister_spawn("spawnlitetree_monster", {"default:leaves", "default:jungleleaves"}, 3, -1, 7000, 3, 31000)
+mobs:register_spawn("spawnlite:tree_monster", {"default:leaves", "default:jungleleaves"}, 3, -1, 7000, 3, 31000)
 
-spawnliteregister_mob("spawnlitesheep", {
+mobs:register_mob("spawnlite:sheep", {
 	type = "animal",
 	hp_max = 5,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1, 0.4},
@@ -180,7 +181,7 @@ spawnliteregister_mob("spawnlitesheep", {
 	walk_velocity = 1,
 	armor = 200,
 	drops = {
-		{name = "spawnlitemeat_raw",
+		{name = "spawnlite:meat_raw",
 		chance = 1,
 		min = 2,
 		max = 3,},
@@ -240,14 +241,14 @@ spawnliteregister_mob("spawnlitesheep", {
 		end
 	end,
 })
-spawnliteregister_spawn("spawnlitesheep", {"default:dirt_with_grass"}, 20, 8, 9000, 1, 31000)
+mobs:register_spawn("spawnlite:sheep", {"default:dirt_with_grass"}, 20, 8, 9000, 1, 31000)
 
-minetest.register_craftitem("spawnlitemeat_raw", {
+minetest.register_craftitem("spawnlite:meat_raw", {
 	description = "Raw Meat",
 	inventory_image = "mobs_meat_raw.png",
 })
 
-minetest.register_craftitem("spawnlitemeat", {
+minetest.register_craftitem("spawnlite:meat", {
 	description = "Meat",
 	inventory_image = "mobs_meat.png",
 	on_use = minetest.item_eat(8),
@@ -255,12 +256,12 @@ minetest.register_craftitem("spawnlitemeat", {
 
 minetest.register_craft({
 	type = "cooking",
-	output = "spawnlitemeat",
-	recipe = "spawnlitemeat_raw",
+	output = "spawnlite:meat",
+	recipe = "spawnlite:meat_raw",
 	cooktime = 5,
 })
 
-spawnliteregister_mob("spawnliterat", {
+mobs:register_mob("spawnlite:rat", {
 	type = "animal",
 	hp_max = 1,
 	collisionbox = {-0.2, -0.01, -0.2, 0.2, 0.2, 0.2},
@@ -278,27 +279,27 @@ spawnliteregister_mob("spawnliterat", {
 	
 	on_rightclick = function(self, clicker)
 		if clicker:is_player() and clicker:get_inventory() then
-			clicker:get_inventory():add_item("main", "spawnliterat")
+			clicker:get_inventory():add_item("main", "spawnlite:rat")
 			self.object:remove()
 		end
 	end,
 })
-spawnliteregister_spawn("spawnliterat", {"default:dirt_with_grass", "default:stone"}, 20, -1, 7000, 1, 31000)
+mobs:register_spawn("spawnlite:rat", {"default:dirt_with_grass", "default:stone"}, 20, -1, 7000, 1, 31000)
 
-minetest.register_craftitem("spawnliterat", {
+minetest.register_craftitem("spawnlite:rat", {
 	description = "Rat",
 	inventory_image = "mobs_rat_inventory.png",
 	
 	on_place = function(itemstack, placer, pointed_thing)
 		if pointed_thing.above then
-			minetest.env:add_entity(pointed_thing.above, "spawnliterat")
+			minetest.env:add_entity(pointed_thing.above, "spawnlite:rat")
 			itemstack:take_item()
 		end
 		return itemstack
 	end,
 })
 	
-minetest.register_craftitem("spawnliterat_cooked", {
+minetest.register_craftitem("spawnlite:rat_cooked", {
 	description = "Cooked Rat",
 	inventory_image = "mobs_cooked_rat.png",
 	
@@ -307,12 +308,12 @@ minetest.register_craftitem("spawnliterat_cooked", {
 
 minetest.register_craft({
 	type = "cooking",
-	output = "spawnliterat_cooked",
-	recipe = "spawnliterat",
+	output = "spawnlite:rat_cooked",
+	recipe = "spawnlite:rat",
 	cooktime = 5,
 })
 
-spawnliteregister_mob("spawnliteoerkki", {
+mobs:register_mob("spawnlite:oerkki", {
 	type = "monster",
 	hp_max = 8,
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.9, 0.4},
@@ -346,9 +347,9 @@ spawnliteregister_mob("spawnliteoerkki", {
 		speed_run = 15,
 	},
 })
-spawnliteregister_spawn("spawnliteoerkki", {"default:stone"}, 2, -1, 7000, 3, -10)
+mobs:register_spawn("spawnlite:oerkki", {"default:stone"}, 2, -1, 7000, 3, -10)
 
-spawnliteregister_mob("spawnlitedungeon_master", {
+mobs:register_mob("spawnlite:dungeon_master", {
 	type = "monster",
 	hp_max = 10,
 	collisionbox = {-0.7, -0.01, -0.7, 0.7, 2.6, 0.7},
@@ -374,7 +375,7 @@ spawnliteregister_mob("spawnlitedungeon_master", {
 	light_damage = 0,
 	on_rightclick = nil,
 	attack_type = "shoot",
-	arrow = "spawnlitefireball",
+	arrow = "spawnlite:fireball",
 	shoot_interval = 2.5,
 	sounds = {
 		attack = "mobs_fireball",
@@ -390,9 +391,9 @@ spawnliteregister_mob("spawnlitedungeon_master", {
 		speed_run = 15,
 	},
 })
-spawnliteregister_spawn("spawnlitedungeon_master", {"default:stone"}, 2, -1, 7000, 1, -50)
+mobs:register_spawn("spawnlite:dungeon_master", {"default:stone"}, 2, -1, 7000, 1, -50)
 
-spawnliteregister_arrow("spawnlitefireball", {
+mobs:register_arrow("spawnlite:fireball", {
 	visual = "sprite",
 	visual_size = {x=1, y=1},
 	--textures = {{name="mobs_fireball.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=0.5}}}, FIXME
