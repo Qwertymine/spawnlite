@@ -1,6 +1,6 @@
 local passive_only = false
 spawnlite = {}
-spawnlite.passive = {{name = "boats:boat",size = {x=2,y=1,z=2},nodes = {"group:cracky","group:crumbly","group:snappy"},min_light = 8}}
+spawnlite.passive = {}
 spawnlite.agressive = {}
 spawnlite.water = {}
 spawnlite.air = {}
