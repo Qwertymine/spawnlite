@@ -25,6 +25,26 @@ spawnlite.mobs.air.max = 5
 local mobs = spawnlite.mobs
 
 
+local function spawn_mob(pos,name,group)
+	minetest.add_entity(pos,name)
+	mobs[name].now = mobs[name].now + 1
+	mobs[group].now = mobs[group].now + 1
+end
+
+
+local function in_group(pos,mob)
+	local node = minetest.get_node(pos)
+	for i=1,#mob.nodes do
+		if node.name == mob.nodes[i] 
+		or minetest.get_item_group(node.name,mob.nodes[i]) ~= 0 then
+			minetest.chat_send_all("spawned?")
+			return true
+		end
+	end
+	return false
+end
+
+
 local function is_space(pos,size)
 	local x,y,z = 1,0,0
 
@@ -73,6 +93,8 @@ local width = 60
 local half_width = width/2
 local height = 80
 local half_height = height/2
+local segments = 3
+local segment_height = math.ceil(height/segments)
 
 --Timing variables
 local timer = 0
@@ -84,59 +106,82 @@ minetest.register_globalstep(function(dtime)
 	end
 	timer = 0
 	local players = minetest.get_connected_players()
-	local rand_x = math.random(0,width-1) - half_width
-	local rand_z = math.random(0,width-1) - half_width
 	local passive = passive_only or math.random(0,1) == 1
-	if passive and mobs.passive.now > mobs.passive.max then
-		return
-	elseif not passive and mobs.agressive.now > mobs.agressive.max then
-		return
-	end
 	for i=1,#players do
 		local spawned = 0
 		local pos = players[i]:getpos()
+		pos.x = pos.x - half_width + math.random(0,width-1)
+		pos.z = pos.z - half_width + math.random(0,width-1)
 		local mob = get_new_mob(passive)
-		local nodes = minetest.find_nodes_in_area_under_air(
-			{x=pos.x+rand_x,y=pos.y-half_height,z=pos.z+rand_z}
-			,{x=pos.x+rand_x,y=pos.y+half_height,z=pos.z+rand_z}
-			,mob.nodes)
-		for i=1,#nodes do
+		local this_segment = pos.y + half_height
+		local next_segment = pos.y + half_height - segment_height
+		for i=1,segments do
+			local search_top = math.random(next_segment+1,this_segment)
 			--Spawn limit conditions
 			if spawned > max_no then
 				break
+			end
+			if passive and mobs.passive.now > mobs.passive.max then
+				return
+			elseif not passive and mobs.agressive.now > mobs.agressive.max then
+				return
 			end
 			if mobs[mob.name].now > mobs[mob.name].max_no then
 				break
 			end
 
-			--Tests to check that placement suitiability for mob
-			local lightlevel = minetest.get_node_light(
-				{x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z})
-			if lightlevel >= mob.min_light 
-			and lightlevel <= mob.max_light
-			and nodes[i].y > mob.min_height
-			and nodes[i].y < mob.max_height 
-			and is_space({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.size) then
-				--chance reduce overall mob spawn rate, but is useful for the programmer
-				if not mob.chance then
-					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
-					mobs[mob.name].now = mobs[mob.name].now + 1
-					if passive then
-						mobs.passive.now = mobs.passive.now + 1
-					else
-						mobs.agressive.now = mobs.agressive.now + 1
-					end
-					spawned = spawned + 1
-				elseif math.random(1,1000) < mob.chance * 10 then
-					minetest.add_entity({x=pos.x+rand_x,y=nodes[i].y+1,z=pos.z+rand_z},mob.name)
-					mobs[mob.name].now = mobs[mob.name].now + 1
-					if passive then
-						mobs.passive.now = mobs.passive.now + 1
-					else
-						mobs.agressive.now = mobs.agressive.now + 1
-					end
-					spawned = spawned + 1
+			--try to find next node
+			local los,node_pos = minetest.line_of_sight({x=pos.x,y=search_top,z=pos.z},{x=pos.x,y=pos.y-half_height,z=pos.z})
+			--NONE FOUND
+			if los then
+				--IF I ADD SEARCH CANCELLING THERE MAY NEED TO BE 
+				--A SPECIAL SPAWN FUNCTION HERE
+				break
+			end
+			--BLOCKED BY STARTING NODE - NO AIR
+			--node_pos.y = math.floor(node_pos.y)
+			if node_pos.y == search_top then
+				--TODO TRY SPAWN GROUND/WATER
+			--CHEAP MOB FAIL CONDITIONS
+			elseif node_pos.y < mob.min_height then
+				break
+			elseif node_pos.y > mob.max_height then
+				if pos.y - half_height > mob.max_height then
+					break
 				end
+			elseif (mob.size.x * mob.size.z == 1 and mob.size.y < search_top - node_pos.y)
+			or is_space({x=pos.x,y=node_pos.y+1,z=pos.z},mob.size) then
+				local lightlevel = minetest.get_node_light(
+					{x=pos.x,y=node_pos.y+1,z=pos.z})
+				if lightlevel
+				and lightlevel >= mob.min_light 
+				and lightlevel <= mob.max_light
+				and in_group(node_pos,mob) then
+					--chance reduce overall mob spawn rate, but is useful for the programmer if not mob.chance then
+					if not mob.chance then
+						spawn_mob({x=pos.x,y=node_pos.y+1,z=pos.z},mob.name,mob.group)
+						spawned = spawned + 1
+					elseif math.random(1,1000) < mob.chance * 10 then
+						spawn_mob({x=pos.x,y=node_pos.y+1,z=pos.z},mob.name,mob.group)
+						spawned = spawned + 1
+					end
+				end
+			end
+			--Varible setup for next segment
+			next_segment = next_segment - segment_height
+			if node_pos.y < next_segment + segment_height then
+				this_segment = node_pos.y
+				while next_segment > this_segment do
+					next_segment = next_segment - segment_height
+				end
+				if next_segment < pos.y - half_height then
+					next_segment = pos.y - half_height
+				end
+			else
+				this_segment = next_segment + segment_height
+			end
+			if this_segment <= pos.y - height then
+				break
 			end
 		end
 	end
