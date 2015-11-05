@@ -87,6 +87,11 @@ minetest.register_globalstep(function(dtime)
 	local rand_x = math.random(0,width-1) - half_width
 	local rand_z = math.random(0,width-1) - half_width
 	local passive = passive_only or math.random(0,1) == 1
+	if passive and mobs.passive.now > mobs.passive.max then
+		return
+	elseif not passive and mobs.agressive.now > mobs.agressive.max then
+		return
+	end
 	for i=1,#players do
 		local spawned = 0
 		local pos = players[i]:getpos()
@@ -99,11 +104,6 @@ minetest.register_globalstep(function(dtime)
 			--Spawn limit conditions
 			if spawned > max_no then
 				break
-			end
-			if passive and mobs.passive.now > mobs.passive.max then
-				return
-			elseif not passive and mobs.agressive.now > mobs.agressive.max then
-				return
 			end
 			if mobs[mob.name].now > mobs[mob.name].max_no then
 				break
@@ -223,3 +223,4 @@ spawnlite.register_specific = function(name,nodes,ignored_neighbors,min_light
 end
 
 dofile(minetest.get_modpath("spawnlite").."/mobs/init.lua")
+dofile(minetest.get_modpath("spawnlite").."/infotools.lua")
